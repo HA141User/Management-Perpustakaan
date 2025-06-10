@@ -11,11 +11,14 @@ public abstract class LibraryItem {
         this.isBorrowed = isBorrowed;
     }
     
-    // Getter methods agar bisa diakses oleh PropertyValueFactory di JavaFX
+    // Getter methods
     public String getTitle() { return title; }
     public int getItemId() { return itemId; }
     public boolean getIsBorrowed() { return isBorrowed; }
-
+    
+    // Setter methods (BARU)
+    public void setTitle(String title) { this.title = title; }
+    public void setIsBorrowed(boolean isBorrowed) { this.isBorrowed = isBorrowed; }
 
     public abstract String getDescription();
     public abstract String borrowItem(int days);

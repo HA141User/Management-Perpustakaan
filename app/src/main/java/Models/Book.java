@@ -11,6 +11,9 @@ public class Book extends LibraryItem {
     // Getter
     public String getAuthor() { return author; }
 
+    // Setter (BARU)
+    public void setAuthor(String author) { this.author = author; }
+
     @Override
     public String getDescription() {
         return "Buku: " + title + " oleh " + author + ", ID: " + itemId;
