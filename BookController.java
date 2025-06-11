@@ -2,7 +2,6 @@ package management.perpustakaan;
 
 import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import Models.Book;
 import javafx.collections.FXCollections;
@@ -24,7 +23,7 @@ public class BookController {
     @FXML private TableColumn<Book, Integer> idColumn;
     @FXML private TableColumn<Book, String> titleColumn;
     @FXML private TableColumn<Book, String> authorColumn;
-    @FXML private TableColumn<Book, Boolean> statusColumn;
+    @FXML private TableColumn<Book, String> statusColumn;
 
     // FXML Form Elements
     @FXML private VBox formVBox; // VBox yang berisi form
@@ -74,12 +73,12 @@ public class BookController {
      * Memuat ulang data dari App.library dan menampilkannya di tabel.
      */
     private void refreshBookTable() {
-        ObservableList<Book> bookList = FXCollections.observableArrayList(
-                App.library.items.stream()
-                        .filter(item -> item instanceof Book)
-                        .map(item -> (Book) item)
-                        .collect(Collectors.toList())
-        );
+        ObservableList<Book> bookList = FXCollections.observableArrayList();
+        for (var item : App.library.items) {
+            if (item instanceof Book) {
+                bookList.add((Book) item);
+            }
+        }
         bookTable.setItems(bookList);
         bookTable.refresh(); // Memastikan tabel di-render ulang
     }
@@ -127,10 +126,13 @@ public class BookController {
 
         if (selectedBookForEdit == null) {
             // Mode Tambah Buku Baru
-            int newId = App.library.items.stream()
-                                  .mapToInt(item -> item.getItemId())
-                                  .max()
-                                  .orElse(0) + 1;
+            int maxId = 0;
+            for (var item : App.library.items) {
+                if (item.getItemId() > maxId) {
+                    maxId = item.getItemId();
+                }
+            }
+            int newId = maxId + 1;
             Book newBook = new Book(title, newId, false, author);
             App.library.items.add(newBook);
             showAlert(Alert.AlertType.INFORMATION, "Sukses", "Buku baru berhasil ditambahkan.");
