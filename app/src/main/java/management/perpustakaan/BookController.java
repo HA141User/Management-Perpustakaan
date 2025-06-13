@@ -16,7 +16,7 @@ public class BookController {
     @FXML private TableColumn<Book, Integer> idColumn;
     @FXML private TableColumn<Book, String> titleColumn;
     @FXML private TableColumn<Book, String> authorColumn;
-    @FXML private TableColumn<Book, Boolean> statusColumn;
+    @FXML private TableColumn<Book, String> statusColumn; // Ubah dari Boolean ke String
     @FXML private VBox formVBox;
     @FXML private TextField titleField;
     @FXML private TextField authorField;
@@ -33,7 +33,35 @@ public class BookController {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("itemId"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("isBorrowed"));
+        
+        // Custom cell value factory untuk status yang user-friendly
+        statusColumn.setCellValueFactory(cellData -> {
+            Book book = cellData.getValue();
+            String statusText = book.getIsBorrowed() ? "Dipinjam" : "Tersedia";
+            return new javafx.beans.property.SimpleStringProperty(statusText);
+        });
+
+        // Optional: Tambahkan styling untuk status
+        statusColumn.setCellFactory(column -> {
+            return new TableCell<Book, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        // Warna berbeda untuk status yang berbeda
+                        if ("Dipinjam".equals(item)) {
+                            setStyle("-fx-text-fill: #d32f2f; -fx-font-weight: bold;"); // Merah
+                        } else {
+                            setStyle("-fx-text-fill: #388e3c; -fx-font-weight: bold;"); // Hijau
+                        }
+                    }
+                }
+            };
+        });
 
         refreshBookTable();
         formVBox.setVisible(false);

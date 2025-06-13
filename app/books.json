@@ -6,9 +6,21 @@
     "isBorrowed": true
   },
   {
-    "author": "Tere Liye",
-    "title": "Bulan",
-    "itemId": 2,
-    "isBorrowed": true
+    "author": "JK. Rowling",
+    "title": "Harry Potter",
+    "itemId": 3,
+    "isBorrowed": false
+  },
+  {
+    "author": "sdasd",
+    "title": "sdnsd",
+    "itemId": 4,
+    "isBorrowed": false
+  },
+  {
+    "author": "JK. Rowling",
+    "title": "Harry POtter",
+    "itemId": 5,
+    "isBorrowed": false
   }
 ]
