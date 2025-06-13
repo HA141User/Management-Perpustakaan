@@ -19,11 +19,10 @@
       "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
       "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
       "Name updated from \u0027Budi\u0027 to \u0027Budiman\u0027",
-      "Name updated from \u0027Budiman\u0027 to \u0027Budi pekerti\u0027"
+      "Name updated from \u0027Budiman\u0027 to \u0027Budi pekerti\u0027",
+      "Mengembalikan buku: Bulan"
     ],
-    "borrowedBookIds": [
-      2
-    ],
+    "borrowedBookIds": [],
     "name": "Budi pekerti",
     "id": "M001"
   },
@@ -32,11 +31,10 @@
     "activities": [
       "Member created: M002",
       "Meminjam buku: Bumi",
-      "Name updated from \u0027Ayam\u0027 to \u0027Ayam kampung\u0027"
+      "Name updated from \u0027Ayam\u0027 to \u0027Ayam kampung\u0027",
+      "Mengembalikan buku: Bumi"
     ],
-    "borrowedBookIds": [
-      1
-    ],
+    "borrowedBookIds": [],
     "name": "Ayam kampung",
     "id": "M002"
   },

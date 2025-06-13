@@ -53,7 +53,7 @@ public class Member extends Person implements MemberOperations {
         this.activities = new ArrayList<>();
         this.borrowedBooks = new ArrayList<>();
         this.borrowedBookIds = new ArrayList<>();
-        this.activities.add("Member created: " + this.memberId);
+        this.activities.add("Anggota telah terdaftar: " + this.memberId);
     }
     
     public Member(String name, String customId) {
@@ -66,7 +66,7 @@ public class Member extends Person implements MemberOperations {
         this.activities = new ArrayList<>();
         this.borrowedBooks = new ArrayList<>();
         this.borrowedBookIds = new ArrayList<>();
-        this.activities.add("Member created with custom ID: " + this.memberId);
+        this.activities.add("Anggota telah terdaftar dengan custom ID: " + this.memberId);
     }
     
     public void borrowBook(Book book) {
@@ -112,7 +112,7 @@ public class Member extends Person implements MemberOperations {
         }
         String oldName = this.name;
         setName(newName);
-        activities.add("Name updated from '" + oldName + "' to '" + this.name + "'");
+        activities.add("Nama telah diubah dari '" + oldName + "' menjadi '" + this.name + "'");
     }
     
     @Override
