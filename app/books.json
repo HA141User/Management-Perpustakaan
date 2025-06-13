@@ -1,14 +1,15 @@
+
 [
   {
     "author": "Tere Liye",
     "title": "Bumi",
     "itemId": 1,
-    "isBorrowed": true
+    "isBorrowed": false
   },
   {
     "author": "Tere Liye",
     "title": "Bulan",
     "itemId": 2,
-    "isBorrowed": true
+    "isBorrowed": false
   }
 ]
