@@ -12,54 +12,81 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="15.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17" fx:controller="management.perpustakaan.BookController">
+
+<VBox alignment="CENTER" spacing="15.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17" fx:controller="management.perpustakaan.BookController" style="-fx-background-color: linear-gradient(to bottom, #fef7ff, #f8f0ff);">
+
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 
-    <Label text="Daftar Buku Perpustakaan" style="-fx-font-size: 24px; -fx-font-weight: bold;" />
 
-    <!-- Tabel untuk menampilkan daftar buku -->
-    <TableView fx:id="bookTable" VBox.vgrow="ALWAYS">
+    <Label text="📚 Daftar Buku Perpustakaan" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #6a4c93;" />
+
+    <TableView fx:id="bookTable" VBox.vgrow="ALWAYS" style="-fx-background-color: #faf8ff; -fx-background-radius: 10; -fx-border-color: #e1bee7; -fx-border-width: 1; -fx-border-radius: 10;">
         <columns>
-            <TableColumn fx:id="idColumn" text="ID" prefWidth="50" />
-            <TableColumn fx:id="titleColumn" text="Judul" prefWidth="250" />
-            <TableColumn fx:id="authorColumn" text="Penulis" prefWidth="200" />
-            <TableColumn fx:id="statusColumn" text="Status (Dipinjam?)" prefWidth="150" />
+            <TableColumn fx:id="idColumn" text="🆔 ID" prefWidth="80" />
+            <TableColumn fx:id="titleColumn" text="📖 Judul" prefWidth="280" />
+            <TableColumn fx:id="authorColumn" text="✍️ Penulis" prefWidth="220" />
+            <TableColumn fx:id="statusColumn" text="📊 Status" prefWidth="150" />
         </columns>
+        <placeholder>
+            <VBox alignment="CENTER" spacing="8.0" style="-fx-padding: 30;">
+                <Label text="📚" style="-fx-font-size: 36px;" />
+                <Label text="Belum ada buku tersedia" style="-fx-font-size: 14px; -fx-text-fill: #9575cd; -fx-font-weight: bold;" />
+                <Label text="Tambahkan buku baru untuk memulai!" style="-fx-font-size: 11px; -fx-text-fill: #b39ddb;" />
+            </VBox>
+        </placeholder>
     </TableView>
 
-    <!-- Tombol Aksi Utama -->
     <HBox alignment="CENTER" spacing="10.0">
-        <Button fx:id="addButton" text="Tambah Buku Baru" onAction="#handleAddButton" style="-fx-background-color: #4CAF50; -fx-text-fill: white;" />
-        <Button fx:id="editButton" text="Edit Buku Terpilih" onAction="#handleEditButton" style="-fx-background-color: #2196F3; -fx-text-fill: white;" />
-        <Button fx:id="deleteButton" text="Hapus Buku Terpilih" onAction="#handleDeleteButton" style="-fx-background-color: #f44336; -fx-text-fill: white;" />
+        <Button fx:id="addButton" text="➕ Tambah Buku Baru" onAction="#handleAddButton"
+                style="-fx-background-color: linear-gradient(to bottom, #81c784, #66bb6a); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);" />
+        <Button fx:id="editButton" text="✏️ Edit Buku Terpilih" onAction="#handleEditButton"
+                style="-fx-background-color: linear-gradient(to bottom, #64b5f6, #42a5f5); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);" />
+        <Button fx:id="deleteButton" text="🗑️ Hapus Buku Terpilih" onAction="#handleDeleteButton"
+                style="-fx-background-color: linear-gradient(to bottom, #e57373, #ef5350); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);" />
     </HBox>
 
-    <!-- Form untuk Tambah/Edit Buku (Awalnya tersembunyi) -->
-    <VBox fx:id="formVBox" alignment="CENTER_LEFT" spacing="10.0" style="-fx-border-color: lightgrey; -fx-border-width: 1; -fx-padding: 15; -fx-border-radius: 5;">
+    <VBox fx:id="formVBox" alignment="TOP_LEFT" spacing="10.0"
+          maxWidth="600"
+          style="-fx-background-color: rgba(255,255,255,0.8); -fx-border-color: #f8bbd9; -fx-border-width: 2; -fx-padding: 15; -fx-border-radius: 10; -fx-background-radius: 10;">
+        
+        <Label text="📝 Form Input Buku"
+               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #ad1457;" />
+        
         <GridPane hgap="10" vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="300.0" />
+                <ColumnConstraints halignment="RIGHT" minWidth="100.0" prefWidth="150.0" />
+                <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" prefWidth="400.0" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="30.0" vgrow="SOMETIMES"/>
+                <RowConstraints minHeight="40.0" vgrow="SOMETIMES"/>
             </rowConstraints>
             <children>
-                <Label text="Judul Buku:" GridPane.rowIndex="0" />
-                <TextField fx:id="titleField" promptText="Masukkan judul buku" GridPane.columnIndex="1" GridPane.rowIndex="0" />
-                
-                <Label text="Nama Penulis:" GridPane.rowIndex="1" />
-                <TextField fx:id="authorField" promptText="Masukkan nama penulis" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                
-                <Button fx:id="saveButton" onAction="#handleSaveButton" text="Simpan" GridPane.columnIndex="1" GridPane.rowIndex="2" style="-fx-background-color: #008CBA; -fx-text-fill: white;"/>
+                <Label text="📖 Judul Buku:" GridPane.rowIndex="0"
+                       style="-fx-font-weight: bold; -fx-text-fill: #6a1b9a;" />
+                <TextField fx:id="titleField" promptText="Masukkan judul buku"
+                           GridPane.columnIndex="1" GridPane.rowIndex="0"
+                           style="-fx-background-color: #f3e5f5; -fx-background-radius: 8; -fx-border-color: #e1bee7; -fx-border-radius: 8; -fx-padding: 6;" />
+
+                <Label text="✍️ Nama Penulis:" GridPane.rowIndex="1"
+                       style="-fx-font-weight: bold; -fx-text-fill: #6a1b9a;" />
+                <TextField fx:id="authorField" promptText="Masukkan nama penulis"
+                           GridPane.columnIndex="1" GridPane.rowIndex="1"
+                           style="-fx-background-color: #f3e5f5; -fx-background-radius: 8; -fx-border-color: #e1bee7; -fx-border-radius: 8; -fx-padding: 6;" />
+
+                <Button fx:id="saveButton" onAction="#handleSaveButton" text="💾 Simpan"
+                        GridPane.columnIndex="1" GridPane.rowIndex="2"
+                        style="-fx-background-color: linear-gradient(to bottom, #ab47bc, #9c27b0); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 15; -fx-padding: 8 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);" />
+
             </children>
         </GridPane>
     </VBox>
 
-    <Button text="Kembali ke Menu Utama" onAction="#handleBackButton" style="-fx-margin-top: 20;" />
 
+    <Button text="🏠 Kembali ke Menu Utama" onAction="#handleBackButton"
+            style="-fx-background-color: linear-gradient(to bottom, #ffb74d, #ff9800); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);" />
 </VBox>
+

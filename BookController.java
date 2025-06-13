@@ -1,67 +1,85 @@
 package management.perpustakaan;
 
 import java.io.IOException;
-import java.util.Optional;
 
+import java.util.stream.Collectors;
 import Models.Book;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
+
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 
 public class BookController {
 
-    // FXML Table and Columns
+    // FXML fields...
+
     @FXML private TableView<Book> bookTable;
     @FXML private TableColumn<Book, Integer> idColumn;
     @FXML private TableColumn<Book, String> titleColumn;
     @FXML private TableColumn<Book, String> authorColumn;
-    @FXML private TableColumn<Book, String> statusColumn;
-
-    // FXML Form Elements
-    @FXML private VBox formVBox; // VBox yang berisi form
+    @FXML private TableColumn<Book, String> statusColumn; // Ubah dari Boolean ke String
+    @FXML private VBox formVBox;
     @FXML private TextField titleField;
     @FXML private TextField authorField;
-    @FXML private Button saveButton;
-    @FXML private Button addButton;
+    @FXML private TextField borrowMemberIdField;
+    @FXML private TextField borrowBookIdField;
+    @FXML private TextField returnBookIdField;
     @FXML private Button editButton;
     @FXML private Button deleteButton;
 
-    private Book selectedBookForEdit = null; // Untuk melacak buku yang sedang diedit
+    private Book selectedBookForEdit = null;
 
     @FXML
     public void initialize() {
-        // Setup kolom tabel
         idColumn.setCellValueFactory(new PropertyValueFactory<>("itemId"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("isBorrowed"));
+        
+        // Custom cell value factory untuk status yang user-friendly
+        statusColumn.setCellValueFactory(cellData -> {
+            Book book = cellData.getValue();
+            String statusText = book.getIsBorrowed() ? "Dipinjam" : "Tersedia";
+            return new javafx.beans.property.SimpleStringProperty(statusText);
+        });
 
-        // Muat data buku ke dalam tabel
+        // Optional: Tambahkan styling untuk status
+        statusColumn.setCellFactory(column -> {
+            return new TableCell<Book, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        // Warna berbeda untuk status yang berbeda
+                        if ("Dipinjam".equals(item)) {
+                            setStyle("-fx-text-fill: #d32f2f; -fx-font-weight: bold;"); // Merah
+                        } else {
+                            setStyle("-fx-text-fill: #388e3c; -fx-font-weight: bold;"); // Hijau
+                        }
+                    }
+                }
+            };
+        });
+
         refreshBookTable();
-
-        // Sembunyikan form pada awalnya
         formVBox.setVisible(false);
         formVBox.managedProperty().bind(formVBox.visibleProperty());
-
-        // Nonaktifkan tombol edit dan hapus sampai ada item yang dipilih
         editButton.setDisable(true);
         deleteButton.setDisable(true);
 
-        // Tambahkan listener ke tabel untuk mendeteksi item yang dipilih
+
         bookTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             boolean isItemSelected = newSelection != null;
             editButton.setDisable(!isItemSelected);
             deleteButton.setDisable(!isItemSelected);
-            
-            // Jika ada item yang dipilih, sembunyikan form dan reset mode edit
+
+
             if (isItemSelected) {
                 formVBox.setVisible(false);
                 selectedBookForEdit = null;
@@ -69,48 +87,66 @@ public class BookController {
         });
     }
 
-    /**
-     * Memuat ulang data dari App.library dan menampilkannya di tabel.
-     */
+
     private void refreshBookTable() {
-        ObservableList<Book> bookList = FXCollections.observableArrayList();
-        for (var item : App.library.items) {
-            if (item instanceof Book) {
-                bookList.add((Book) item);
-            }
-        }
+        ObservableList<Book> bookList = FXCollections.observableArrayList(
+                App.library.items.stream()
+                        .filter(item -> item instanceof Book)
+                        .map(item -> (Book) item)
+                        .collect(Collectors.toList())
+        );
         bookTable.setItems(bookList);
-        bookTable.refresh(); // Memastikan tabel di-render ulang
     }
 
     @FXML
-    private void handleAddButton() {
-        // Bersihkan seleksi tabel agar tidak membingungkan
-        bookTable.getSelectionModel().clearSelection();
-        
-        // Kosongkan form dan siapkan untuk input baru
-        selectedBookForEdit = null;
-        titleField.clear();
-        authorField.clear();
-        saveButton.setText("Simpan Buku Baru");
+    private void handleBorrowAction() {
+        String memberId = borrowMemberIdField.getText();
+        String bookIdText = borrowBookIdField.getText();
 
-        // Tampilkan form
-        formVBox.setVisible(true);
+        // --- PERUBAHAN DI SINI: Tambah validasi input kosong ---
+        if (memberId.trim().isEmpty() || bookIdText.trim().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Input Tidak Lengkap", "ID Anggota dan ID Buku harus diisi.");
+            return;
+        }
+
+        try {
+            int bookId = Integer.parseInt(bookIdText);
+            int duration = 14; // Menggunakan durasi default 14 hari
+            
+            App.library.processBorrowing(memberId, bookId, duration);
+
+            showAlert(Alert.AlertType.INFORMATION, "Sukses", "Buku berhasil dipinjamkan!");
+            saveDataAndRefresh();
+            borrowMemberIdField.clear();
+            borrowBookIdField.clear();
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Input Tidak Valid", "ID Buku harus berupa angka.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Proses Gagal", e.getMessage());
+        }
     }
-
+    
     @FXML
-    private void handleEditButton() {
-        // Ambil buku yang dipilih dari tabel
-        Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
-        if (selectedBook != null) {
-            // Set buku yang akan diedit dan isi form dengan datanya
-            selectedBookForEdit = selectedBook;
-            titleField.setText(selectedBook.getTitle());
-            authorField.setText(selectedBook.getAuthor());
-            saveButton.setText("Simpan Perubahan");
+    private void handleReturnAction() {
+        String bookIdText = returnBookIdField.getText();
 
-            // Tampilkan form untuk mengedit
-            formVBox.setVisible(true);
+        // --- PERUBAHAN DI SINI: Tambah validasi input kosong ---
+        if (bookIdText.trim().isEmpty()) {
+            showAlert(Alert.AlertType.ERROR, "Input Tidak Lengkap", "ID Buku untuk pengembalian harus diisi.");
+            return;
+        }
+
+        try {
+            int bookId = Integer.parseInt(bookIdText);
+            App.library.processReturning(bookId);
+            showAlert(Alert.AlertType.INFORMATION, "Sukses", "Buku berhasil dikembalikan!");
+            saveDataAndRefresh();
+            returnBookIdField.clear();
+        } catch (NumberFormatException e) {
+            showAlert(Alert.AlertType.ERROR, "Input Tidak Valid", "ID Buku harus berupa angka.");
+        } catch (Exception e) {
+            showAlert(Alert.AlertType.ERROR, "Proses Gagal", e.getMessage());
+
         }
     }
 
@@ -119,71 +155,57 @@ public class BookController {
         String title = titleField.getText();
         String author = authorField.getText();
 
-        if (title.isEmpty() || author.isEmpty()) {
+
+        if (title.trim().isEmpty() || author.trim().isEmpty()) {
+
             showAlert(Alert.AlertType.ERROR, "Input Tidak Valid", "Judul dan Penulis tidak boleh kosong.");
             return;
         }
 
         if (selectedBookForEdit == null) {
-            // Mode Tambah Buku Baru
-            int maxId = 0;
-            for (var item : App.library.items) {
-                if (item.getItemId() > maxId) {
-                    maxId = item.getItemId();
-                }
-            }
-            int newId = maxId + 1;
-            Book newBook = new Book(title, newId, false, author);
-            App.library.items.add(newBook);
-            showAlert(Alert.AlertType.INFORMATION, "Sukses", "Buku baru berhasil ditambahkan.");
+
+            int newId = App.library.items.stream().mapToInt(item -> item.getItemId()).max().orElse(0) + 1;
+            App.library.items.add(new Book(title, newId, false, author));
         } else {
-            // Mode Edit Buku
             selectedBookForEdit.setTitle(title);
             selectedBookForEdit.setAuthor(author);
-            showAlert(Alert.AlertType.INFORMATION, "Sukses", "Data buku berhasil diperbarui.");
         }
         
-        // Reset form dan refresh tabel
+        saveDataAndRefresh();
         formVBox.setVisible(false);
-        selectedBookForEdit = null;
         titleField.clear();
         authorField.clear();
-        refreshBookTable();
+
     }
 
     @FXML
     private void handleDeleteButton() {
         Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
         if (selectedBook != null) {
-            // Tampilkan dialog konfirmasi
-            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION);
-            confirmation.setTitle("Konfirmasi Hapus");
-            confirmation.setHeaderText("Anda yakin ingin menghapus buku ini?");
-            confirmation.setContentText("Judul: " + selectedBook.getTitle());
 
-            Optional<ButtonType> result = confirmation.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                // Hapus buku dari list utama
-                App.library.items.remove(selectedBook);
-                refreshBookTable();
-                showAlert(Alert.AlertType.INFORMATION, "Sukses", "Buku berhasil dihapus.");
-            }
+            Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "Yakin hapus: " + selectedBook.getTitle() + "?", ButtonType.YES, ButtonType.NO);
+            confirmation.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.YES) {
+                    App.library.items.remove(selectedBook);
+                    saveDataAndRefresh();
+                }
+            });
         }
     }
+    
+    @FXML private void handleAddButton() { formVBox.setVisible(true); selectedBookForEdit = null; titleField.clear(); authorField.clear(); }
+    @FXML private void handleEditButton() { Book book = bookTable.getSelectionModel().getSelectedItem(); if (book != null) { formVBox.setVisible(true); selectedBookForEdit = book; titleField.setText(book.getTitle()); authorField.setText(book.getAuthor()); } }
+    @FXML private void handleBackButton() throws IOException { App.setRoot("HomeView"); }
 
-    @FXML
-    private void handleBackButton() throws IOException {
-        App.setRoot("HomeView");
+    private void saveDataAndRefresh() {
+        try {
+            PersistenceService.saveData();
+        } catch (IOException e) {
+            showAlert(Alert.AlertType.ERROR, "Gagal Menyimpan", "Terjadi error saat menyimpan data.");
+        }
+        refreshBookTable();
     }
     
-    /**
-     * Helper untuk menampilkan dialog Alert.
-     */
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
-        Alert alert = new Alert(alertType);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
+    private void showAlert(Alert.AlertType type, String title, String msg) { Alert a = new Alert(type, msg); a.setTitle(title); a.setHeaderText(null); a.showAndWait(); }
 }
+
