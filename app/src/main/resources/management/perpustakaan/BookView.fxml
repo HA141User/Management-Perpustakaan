@@ -72,24 +72,32 @@
     </VBox>
 
     <VBox fx:id="borrowVBox" alignment="CENTER" spacing="10.0" visible="false" managed="false" style="-fx-background-color: #fffde7; -fx-border-color: #ffd54f; -fx-border-width: 2; -fx-padding: 10; -fx-border-radius: 10; -fx-background-radius: 10;">
+
         <HBox alignment="CENTER" spacing="10.0">
             <Label text="ID Anggota:" style="-fx-font-weight: bold;"/>
             <TextField fx:id="borrowMemberIdField" promptText="ID Anggota" maxWidth="80"/>
             <Label text="ID Buku:" style="-fx-font-weight: bold;"/>
             <TextField fx:id="borrowBookIdField" promptText="ID Buku" maxWidth="80"/>
+
             <Button text="📥 Pinjam Buku" onAction="#handleBorrowAction" style="-fx-background-color: linear-gradient(to bottom, #ffd54f, #ffb300); -fx-text-fill: #4e342e; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 16;"/>
+
             <Button text="Batal" onAction="#hideBorrowForm"/>
         </HBox>
     </VBox>
+
 
     <VBox fx:id="returnVBox" alignment="CENTER" spacing="10.0" visible="false" managed="false" style="-fx-background-color: #e3f2fd; -fx-border-color: #4fc3f7; -fx-border-width: 2; -fx-padding: 10; -fx-border-radius: 10; -fx-background-radius: 10;">
         <HBox alignment="CENTER" spacing="10.0">
             <Label text="ID Buku:" style="-fx-font-weight: bold;"/>
             <TextField fx:id="returnBookIdField" promptText="ID Buku" maxWidth="80"/>
             <Button text="📤 Kembalikan Buku" onAction="#handleReturnAction" style="-fx-background-color: linear-gradient(to bottom, #4fc3f7, #0288d1); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 16;"/>
+
             <Button text="Batal" onAction="#hideReturnForm"/>
         </HBox>
     </VBox>
 
+
     <Button text="🏠 Kembali ke Menu Utama" onAction="#handleBackButton" style="-fx-background-color: linear-gradient(to bottom, #ffb74d, #ff9800); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);" />
+
+
 </VBox>

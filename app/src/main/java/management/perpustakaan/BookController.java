@@ -26,8 +26,10 @@ public class BookController {
     @FXML private TextField returnBookIdField;
     @FXML private Button editButton;
     @FXML private Button deleteButton;
+
     @FXML private VBox borrowVBox; // Form pinjam
     @FXML private VBox returnVBox; // Form kembali
+
 
     private Book selectedBookForEdit = null;
 
@@ -70,7 +72,8 @@ public class BookController {
         returnVBox.setVisible(false);
         returnVBox.managedProperty().bind(returnVBox.visibleProperty());
 
-        editButton.setDisable(true);
+
+
         deleteButton.setDisable(true);
 
         bookTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
@@ -85,12 +88,12 @@ public class BookController {
     }
 
     private void refreshBookTable() {
-        ObservableList<Book> bookList = FXCollections.observableArrayList(
-                App.library.items.stream()
-                        .filter(item -> item instanceof Book)
-                        .map(item -> (Book) item)
-                        .collect(Collectors.toList())
-        );
+        ObservableList<Book> bookList = FXCollections.observableArrayList();
+        for (var item : App.library.items) {
+            if (item instanceof Book) {
+            bookList.add((Book) item);
+            }
+        }
         bookTable.setItems(bookList);
         bookTable.refresh();
     }
@@ -216,10 +219,12 @@ public class BookController {
         refreshBookTable();
     }
     
+
     private void showAlert(Alert.AlertType type, String title, String msg) { 
         Alert a = new Alert(type, msg); 
         a.setTitle(title); 
         a.setHeaderText(null); 
         a.showAndWait(); 
+
     }
 }
