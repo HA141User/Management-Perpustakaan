@@ -12,10 +12,13 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
+
 <VBox alignment="CENTER" spacing="15.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17" fx:controller="management.perpustakaan.BookController" style="-fx-background-color: linear-gradient(to bottom, #fef7ff, #f8f0ff);">
+
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
+
 
     <Label text="📚 Daftar Buku Perpustakaan" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #6a4c93;" />
 
@@ -77,10 +80,13 @@
                 <Button fx:id="saveButton" onAction="#handleSaveButton" text="💾 Simpan"
                         GridPane.columnIndex="1" GridPane.rowIndex="2"
                         style="-fx-background-color: linear-gradient(to bottom, #ab47bc, #9c27b0); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 15; -fx-padding: 8 25; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 3, 0, 0, 1);" />
+
             </children>
         </GridPane>
     </VBox>
 
+
     <Button text="🏠 Kembali ke Menu Utama" onAction="#handleBackButton"
             style="-fx-background-color: linear-gradient(to bottom, #ffb74d, #ff9800); -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 10 20; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 3, 0, 0, 1);" />
 </VBox>
+
