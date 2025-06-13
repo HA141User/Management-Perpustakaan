@@ -8,31 +8,28 @@ public class Book extends LibraryItem {
         this.author = author;
     }
     
-    // Getter
     public String getAuthor() { return author; }
-
-    // Setter (BARU)
     public void setAuthor(String author) { this.author = author; }
 
     @Override
     public String getDescription() {
-        return "Buku: " + title + " oleh " + author + ", ID: " + itemId;
+        return "Buku: " + getTitle() + " oleh " + author + ", ID: " + getItemId();
     }
 
     @Override
     public String borrowItem(int days) {
-        if (isBorrowed) {
+        if (isBorrowed) { // Menggunakan boolean biasa
             throw new IllegalArgumentException("Item sudah dipinjam.");
         }
         if (days > 14) {
             throw new IllegalArgumentException("Maksimal peminjaman 14 hari.");
         }
-        isBorrowed = true;
-        return "Item " + title + " berhasil dipinjam selama " + days + " hari";
+        isBorrowed = true; // Langsung mengubah nilai
+        return "Item " + getTitle() + " berhasil dipinjam selama " + days + " hari";
     }
 
     @Override
     public double calculateFine(int daysLate) {
-        return daysLate * 10000; // Denda 10.000 per hari keterlambatan
+        return daysLate * 10000;
     }
 }

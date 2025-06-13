@@ -1,44 +1,49 @@
 package management.perpustakaan;
 
-import Models.Book;
-import Models.Library;
-import Models.Member;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import Models.Library;
 
 public class App extends Application {
-
     private static Scene scene;
-    public static Library library = new Library();
+    public static Library library;
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("HomeView"), 640, 480);
+        scene = new Scene(loadFXML("HomeView"), 800, 600);
         stage.setTitle("Sistem Manajemen Perpustakaan");
         stage.setScene(scene);
         stage.show();
     }
 
+    @Override
+    public void stop() throws Exception {
+        PersistenceService.saveData();
+        System.out.println("Aplikasi ditutup, data berhasil disimpan.");
+        super.stop();
+    }
+    
     public static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
+        scene.setRoot(fxmlLoader.load());
     }
     
     private static Parent loadFXML(String fxml) throws IOException {
-        String fxmlPath = "/management/perpustakaan/" + fxml + ".fxml";
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxmlPath));
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
         return fxmlLoader.load();
     }
 
     public static void main(String[] args) {
-        library.addItem(new Book("The Lord of the Rings", 101, false, "J.R.R. Tolkien"));
-        library.addItem(new Book("Laskar Pelangi", 102, true, "Andrea Hirata"));
-        library.members.add(new Member("Budi Santoso", "M001"));
-        library.members.add(new Member("Citra Lestari", "M002"));
-        
-        launch();
+        library = PersistenceService.loadData();
+        if (library.items.isEmpty() && library.members.isEmpty()) {
+            System.out.println("Memulai dengan data kosong. File data akan dibuat saat ada perubahan.");
+        } else {
+            System.out.println("Data berhasil dimuat dari file JSON.");
+        }
+        launch(args);
     }
 }

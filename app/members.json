@@ -1,0 +1,55 @@
+[
+  {
+    "memberId": "M001",
+    "activities": [
+      "Member created: M001",
+      "Meminjam buku: Bumi",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Mengembalikan buku: Bumi",
+      "Meminjam buku: Bumi",
+      "Mengembalikan buku: Bumi",
+      "Meminjam buku: Bulan",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
+      "Name updated from \u0027Budi\u0027 to \u0027Budiman\u0027",
+      "Name updated from \u0027Budiman\u0027 to \u0027Budi pekerti\u0027"
+    ],
+    "borrowedBookIds": [
+      2
+    ],
+    "name": "Budi pekerti",
+    "id": "M001"
+  },
+  {
+    "memberId": "M002",
+    "activities": [
+      "Member created: M002",
+      "Meminjam buku: Bumi",
+      "Name updated from \u0027Ayam\u0027 to \u0027Ayam kampung\u0027"
+    ],
+    "borrowedBookIds": [
+      1
+    ],
+    "name": "Ayam kampung",
+    "id": "M002"
+  },
+  {
+    "memberId": "1",
+    "activities": [
+      "Member created with custom ID: 1",
+      "Name updated from \u0027Wardah\u0027 to \u0027Wardah\u0027",
+      "Name updated from \u0027Wardah\u0027 to \u0027Wardah\u0027",
+      "Name updated from \u0027Wardah\u0027 to \u0027Wardah\u0027"
+    ],
+    "borrowedBookIds": [],
+    "name": "Wardah",
+    "id": "1"
+  }
+]
