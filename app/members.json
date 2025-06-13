@@ -20,7 +20,9 @@
       "Name updated from \u0027Budi\u0027 to \u0027Budi\u0027",
       "Name updated from \u0027Budi\u0027 to \u0027Budiman\u0027",
       "Name updated from \u0027Budiman\u0027 to \u0027Budi pekerti\u0027",
-      "Mengembalikan buku: Bulan"
+      "Mengembalikan buku: Bulan",
+      "Meminjam buku: Bumi saka iu",
+      "Mengembalikan buku: Bumi saka iu"
     ],
     "borrowedBookIds": [],
     "name": "Budi pekerti",
@@ -39,15 +41,16 @@
     "id": "M002"
   },
   {
-    "memberId": "1",
+    "memberId": "M003",
     "activities": [
-      "Member created with custom ID: 1",
-      "Name updated from \u0027Wardah\u0027 to \u0027Wardah\u0027",
-      "Name updated from \u0027Wardah\u0027 to \u0027Wardah\u0027",
-      "Name updated from \u0027Wardah\u0027 to \u0027Wardah\u0027"
+      "Anggota telah terdaftar dengan custom ID: M003",
+      "Nama telah diubah dari \u0027Budiman\u0027 menjadi \u0027Budiman\u0027",
+      "Nama telah diubah dari \u0027Budiman\u0027 menjadi \u0027Budiwati\u0027",
+      "Nama telah diubah dari \u0027Budiwati\u0027 menjadi \u0027Budiwatiman\u0027",
+      "Nama telah diubah dari \u0027Budiwatiman\u0027 menjadi \u0027Budiwati\u0027"
     ],
     "borrowedBookIds": [],
-    "name": "Wardah",
-    "id": "1"
+    "name": "Budiwati",
+    "id": "M003"
   }
 ]

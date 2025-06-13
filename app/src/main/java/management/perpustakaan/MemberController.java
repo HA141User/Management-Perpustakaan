@@ -10,12 +10,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-// <-- PASTIKAN IMPORT INI ADA -->
-import javafx.scene.control.TableView;
-
 public class MemberController implements Initializable {
     
-    // Deklarasi FXML
     @FXML private TextField txtName;
     @FXML private TextField txtCustomId;
     @FXML private CheckBox chkUseCustomId;
@@ -31,11 +27,8 @@ public class MemberController implements Initializable {
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // <-- INI BARIS KUNCI UNTUK MENGGABUNGKAN RUANG KOSONG -->
-        // Ini memerintahkan kolom-kolom untuk melebar mengisi seluruh tabel.
         tblMembers.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
         
-        // Kode yang sudah ada sebelumnya
         colMemberId.setCellValueFactory(new PropertyValueFactory<>("memberId"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colActivities.setCellValueFactory(new PropertyValueFactory<>("activitiesCount"));
@@ -52,6 +45,7 @@ public class MemberController implements Initializable {
 
     private void refreshMemberTable() {
         tblMembers.setItems(FXCollections.observableArrayList(App.library.members));
+        tblMembers.refresh();
         updateUI();
     }
     
@@ -71,24 +65,19 @@ public class MemberController implements Initializable {
                     showAlert("Error", "ID custom tidak boleh kosong!", Alert.AlertType.ERROR);
                     return;
                 }
-                
-                // Check if ID already exists
-                if (isIdExists(customId)) {
+                if (App.library.isMemberIdExists(customId)) {
                     showAlert("Error", "ID sudah digunakan!", Alert.AlertType.ERROR);
                     return;
                 }
-                
                 newMember = new Member(name, customId);
             } else {
-                // Generate unique auto ID
-                String autoId = generateUniqueAutoId();
-                newMember = new Member(name, autoId);
+                newMember = new Member(name);
             }
             
             App.library.members.add(newMember);
             saveDataAndRefresh();
+            showAlert("Sukses", "Anggota baru berhasil ditambahkan dengan ID: " + newMember.getMemberId(), Alert.AlertType.INFORMATION);
             clearForm();
-            showAlert("Success", "Anggota berhasil ditambahkan dengan ID: " + newMember.getMemberId(), Alert.AlertType.INFORMATION);
             
         } catch (IllegalArgumentException e) {
             showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
@@ -97,7 +86,10 @@ public class MemberController implements Initializable {
     
     @FXML
     private void handleUpdateMember() {
-        if (selectedMember == null) return;
+        if (selectedMember == null) {
+            showAlert("Peringatan", "Pilih anggota yang ingin diubah.", Alert.AlertType.WARNING);
+            return;
+        }
         try {
             String newName = txtName.getText();
             if (newName == null || newName.trim().isEmpty()) {
@@ -106,6 +98,7 @@ public class MemberController implements Initializable {
             }
             selectedMember.updateInfo(newName);
             saveDataAndRefresh();
+            showAlert("Sukses", "Data anggota berhasil diperbarui.", Alert.AlertType.INFORMATION);
         } catch (IllegalArgumentException e) {
             showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
         }
@@ -113,12 +106,16 @@ public class MemberController implements Initializable {
     
     @FXML
     private void handleDeleteMember() {
-        if (selectedMember == null) return;
+        if (selectedMember == null) {
+            showAlert("Peringatan", "Pilih anggota yang ingin dihapus.", Alert.AlertType.WARNING);
+            return;
+        }
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Yakin hapus: " + selectedMember.getName() + "?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
                 App.library.members.remove(selectedMember);
                 saveDataAndRefresh();
+                showAlert("Sukses", "Anggota berhasil dihapus.", Alert.AlertType.INFORMATION);
             }
         });
     }
@@ -132,9 +129,23 @@ public class MemberController implements Initializable {
         refreshMemberTable();
     }
     
-    @FXML private void handleClearForm() { clearForm(); tblMembers.getSelectionModel().clearSelection(); }
-    @FXML private void handleMemberDoubleClick() { if (selectedMember != null) txtName.setText(selectedMember.getName()); }
-    @FXML private void handleBackButton() throws IOException { App.setRoot("HomeView"); }
+    @FXML 
+    private void handleClearForm() { 
+        clearForm(); 
+        tblMembers.getSelectionModel().clearSelection(); 
+    }
+    
+    @FXML 
+    private void handleMemberDoubleClick() { 
+        if (selectedMember != null) {
+            txtName.setText(selectedMember.getName());
+        }
+    }
+    
+    @FXML 
+    private void handleBackButton() throws IOException { 
+        App.setRoot("HomeView"); 
+    }
 
     private void updateSelectedMemberInfo() {
         if (selectedMember != null) {
@@ -161,30 +172,5 @@ public class MemberController implements Initializable {
         a.setTitle(title); 
         a.setHeaderText(null); 
         a.showAndWait(); 
-    }
-    
-    /**
-     * Check if ID already exists in the member list
-     */
-    private boolean isIdExists(String id) {
-        return App.library.members.stream()
-               .anyMatch(member -> member.getMemberId().equals(id));
-    }
-    
-    /**
-     * Generate unique auto ID with format M001, M002, M003, etc.
-     * Ensures no duplicate IDs exist in the current member list
-     */
-    private String generateUniqueAutoId() {
-        int nextNumber = 1;
-        String candidateId;
-        
-        // Find the next available number
-        do {
-            candidateId = "M" + String.format("%03d", nextNumber);
-            nextNumber++;
-        } while (isIdExists(candidateId));
-        
-        return candidateId;
     }
 }
