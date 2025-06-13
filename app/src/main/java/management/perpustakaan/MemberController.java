@@ -64,10 +64,32 @@ public class MemberController implements Initializable {
                 return;
             }
 
-            Member newMember = chkUseCustomId.isSelected() ? new Member(name, txtCustomId.getText()) : new Member(name);
+            Member newMember;
+            if (chkUseCustomId.isSelected()) {
+                String customId = txtCustomId.getText();
+                if (customId == null || customId.trim().isEmpty()) {
+                    showAlert("Error", "ID custom tidak boleh kosong!", Alert.AlertType.ERROR);
+                    return;
+                }
+                
+                // Check if ID already exists
+                if (isIdExists(customId)) {
+                    showAlert("Error", "ID sudah digunakan!", Alert.AlertType.ERROR);
+                    return;
+                }
+                
+                newMember = new Member(name, customId);
+            } else {
+                // Generate unique auto ID
+                String autoId = generateUniqueAutoId();
+                newMember = new Member(name, autoId);
+            }
+            
             App.library.members.add(newMember);
             saveDataAndRefresh();
             clearForm();
+            showAlert("Success", "Anggota berhasil ditambahkan dengan ID: " + newMember.getMemberId(), Alert.AlertType.INFORMATION);
+            
         } catch (IllegalArgumentException e) {
             showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
         }
@@ -139,5 +161,30 @@ public class MemberController implements Initializable {
         a.setTitle(title); 
         a.setHeaderText(null); 
         a.showAndWait(); 
+    }
+    
+    /**
+     * Check if ID already exists in the member list
+     */
+    private boolean isIdExists(String id) {
+        return App.library.members.stream()
+               .anyMatch(member -> member.getMemberId().equals(id));
+    }
+    
+    /**
+     * Generate unique auto ID with format M001, M002, M003, etc.
+     * Ensures no duplicate IDs exist in the current member list
+     */
+    private String generateUniqueAutoId() {
+        int nextNumber = 1;
+        String candidateId;
+        
+        // Find the next available number
+        do {
+            candidateId = "M" + String.format("%03d", nextNumber);
+            nextNumber++;
+        } while (isIdExists(candidateId));
+        
+        return candidateId;
     }
 }
