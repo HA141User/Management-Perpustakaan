@@ -202,7 +202,7 @@ Proyek ini menggunakan **Gradle Wrapper** (`gradlew`), yang berarti Anda tidak p
 
 | No. | Nama                    | Tugas                                                                                                                |
 |-----|-------------------------|----------------------------------------------------------------------------------------------------------------------|
-| 1.  | Hilmy Affayad Akbar     | Mengelola daftar buku: menampilkan nama buku, ID, status peminjaman (termasuk ID anggota yang meminjam), serta tombol tambah, edit, dan hapus buku. |
+| 1.  | Hilmy Affayyad Akbar     | Mengelola daftar buku: menampilkan nama buku, ID, status peminjaman (termasuk ID anggota yang meminjam), serta tombol tambah, edit, dan hapus buku. |
 | 2.  | Maisyah Mahdiyyah       | Mengelola daftar anggota: menampilkan ID dan nama anggota, tombol tambah, edit, hapus, bersihkan daftar anggota, serta fitur simpan/muat data JSON. |
 | 3.  | Muhammad Hairi          | Mengelola halaman utama: menampilkan tombol navigasi ke daftar anggota dan daftar buku, serta judul "Management Perpustakaan". |
 
@@ -215,5 +215,5 @@ Proyek ini menggunakan **Gradle Wrapper** (`gradlew`), yang berarti Anda tidak p
 * **Mata Kuliah**: Pemrograman Berorientasi Objek
 * **Anggota**:  
   * Muhammad Hairi
-  * Hilmy Affayad Akbar  
+  * Hilmy Affayyad Akbar  
   * Maisyah Mahdiyyah
