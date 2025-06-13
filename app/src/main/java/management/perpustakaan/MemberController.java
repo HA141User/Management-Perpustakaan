@@ -2,57 +2,82 @@ package management.perpustakaan;
 
 import Models.Member;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import java.io.IOException;
-import java.net.URL;
-import java.util.ResourceBundle;
 
-// <-- PASTIKAN IMPORT INI ADA -->
-import javafx.scene.control.TableView;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.ResourceBundle;
 
 public class MemberController implements Initializable {
     
-    // Deklarasi FXML
+    // FXML Components
     @FXML private TextField txtName;
     @FXML private TextField txtCustomId;
     @FXML private CheckBox chkUseCustomId;
+    @FXML private Button btnAdd;
+    @FXML private Button btnUpdate;
+    @FXML private Button btnDelete;
+    @FXML private Button btnClear;
+    @FXML private Button btnAddActivity;
+    @FXML private TextField txtActivity;
+    @FXML private TextArea txtDetails;
     @FXML private TableView<Member> tblMembers;
     @FXML private TableColumn<Member, String> colMemberId;
     @FXML private TableColumn<Member, String> colName;
     @FXML private TableColumn<Member, Integer> colActivities;
+    @FXML private TableColumn<Member, Boolean> colValid;
     @FXML private ListView<String> listActivities;
     @FXML private Label lblTotalMembers;
     @FXML private Label lblSelectedMember;
     
+    // Data Storage
+    private ObservableList<Member> memberList;
     private Member selectedMember;
     
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        // <-- INI BARIS KUNCI UNTUK MENGGABUNGKAN RUANG KOSONG -->
-        // Ini memerintahkan kolom-kolom untuk melebar mengisi seluruh tabel.
-        tblMembers.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        // Initialize data
+        memberList = FXCollections.observableArrayList();
         
-        // Kode yang sudah ada sebelumnya
+        // Setup table columns
         colMemberId.setCellValueFactory(new PropertyValueFactory<>("memberId"));
         colName.setCellValueFactory(new PropertyValueFactory<>("name"));
         colActivities.setCellValueFactory(new PropertyValueFactory<>("activitiesCount"));
+        colValid.setCellValueFactory(new PropertyValueFactory<>("validMember"));
         
-        refreshMemberTable();
+        // Bind table data
+        tblMembers.setItems(memberList);
         
-        tblMembers.getSelectionModel().selectedItemProperty().addListener((obs, ov, nv) -> {
-            selectedMember = nv;
-            updateSelectedMemberInfo();
-        });
+        // Setup table selection listener
+        tblMembers.getSelectionModel().selectedItemProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                selectedMember = newValue;
+                updateSelectedMemberInfo();
+            }
+        );
         
-        txtCustomId.disableProperty().bind(chkUseCustomId.selectedProperty().not());
-    }
-
-    private void refreshMemberTable() {
-        tblMembers.setItems(FXCollections.observableArrayList(App.library.members));
+        // Setup custom ID checkbox
+        chkUseCustomId.selectedProperty().addListener(
+            (observable, oldValue, newValue) -> {
+                txtCustomId.setDisable(!newValue);
+                if (!newValue) {
+                    txtCustomId.clear();
+                }
+            }
+        );
+        
+        // Initial state
+        txtCustomId.setDisable(true);
         updateUI();
+        
+        // Sample data
+        addSampleData();
     }
     
     @FXML
@@ -63,7 +88,7 @@ public class MemberController implements Initializable {
                 showAlert("Error", "Nama anggota tidak boleh kosong!", Alert.AlertType.ERROR);
                 return;
             }
-
+            
             Member newMember;
             if (chkUseCustomId.isSelected()) {
                 String customId = txtCustomId.getText();
@@ -80,111 +105,160 @@ public class MemberController implements Initializable {
                 
                 newMember = new Member(name, customId);
             } else {
-                // Generate unique auto ID
-                String autoId = generateUniqueAutoId();
-                newMember = new Member(name, autoId);
+                newMember = new Member(name);
             }
             
-            App.library.members.add(newMember);
-            saveDataAndRefresh();
+            memberList.add(newMember);
             clearForm();
-            showAlert("Success", "Anggota berhasil ditambahkan dengan ID: " + newMember.getMemberId(), Alert.AlertType.INFORMATION);
+            updateUI();
+            showAlert("Success", "Anggota berhasil ditambahkan!", Alert.AlertType.INFORMATION);
             
-        } catch (IllegalArgumentException e) {
-            showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
+        } catch (Exception e) {
+            showAlert("Error", "Error: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
     
     @FXML
     private void handleUpdateMember() {
-        if (selectedMember == null) return;
+        if (selectedMember == null) {
+            showAlert("Warning", "Pilih anggota yang akan diupdate!", Alert.AlertType.WARNING);
+            return;
+        }
+        
         try {
             String newName = txtName.getText();
             if (newName == null || newName.trim().isEmpty()) {
                 showAlert("Error", "Nama baru tidak boleh kosong!", Alert.AlertType.ERROR);
                 return;
             }
+            
             selectedMember.updateInfo(newName);
-            saveDataAndRefresh();
-        } catch (IllegalArgumentException e) {
-            showAlert("Error", e.getMessage(), Alert.AlertType.ERROR);
+            tblMembers.refresh();
+            updateSelectedMemberInfo();
+            clearForm();
+            showAlert("Success", "Data anggota berhasil diupdate!", Alert.AlertType.INFORMATION);
+            
+        } catch (Exception e) {
+            showAlert("Error", "Error: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
     
     @FXML
     private void handleDeleteMember() {
-        if (selectedMember == null) return;
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Yakin hapus: " + selectedMember.getName() + "?", ButtonType.YES, ButtonType.NO);
-        alert.showAndWait().ifPresent(response -> {
-            if (response == ButtonType.YES) {
-                App.library.members.remove(selectedMember);
-                saveDataAndRefresh();
-            }
-        });
-    }
-    
-    private void saveDataAndRefresh() {
-        try {
-            PersistenceService.saveData();
-        } catch (IOException e) {
-            showAlert("Gagal Menyimpan", e.getMessage(), Alert.AlertType.ERROR);
+        if (selectedMember == null) {
+            showAlert("Warning", "Pilih anggota yang akan dihapus!", Alert.AlertType.WARNING);
+            return;
         }
-        refreshMemberTable();
+        
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Konfirmasi");
+        alert.setHeaderText("Hapus Anggota");
+        alert.setContentText("Yakin ingin menghapus anggota: " + selectedMember.getName() + "?");
+        
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            memberList.remove(selectedMember);
+            selectedMember = null;
+            clearForm();
+            updateUI();
+            showAlert("Success", "Anggota berhasil dihapus!", Alert.AlertType.INFORMATION);
+        }
     }
     
-    @FXML private void handleClearForm() { clearForm(); tblMembers.getSelectionModel().clearSelection(); }
-    @FXML private void handleMemberDoubleClick() { if (selectedMember != null) txtName.setText(selectedMember.getName()); }
-    @FXML private void handleBackButton() throws IOException { App.setRoot("HomeView"); }
+    @FXML
+    private void handleClearForm() {
+        clearForm();
+        tblMembers.getSelectionModel().clearSelection();
+        selectedMember = null;
+        updateSelectedMemberInfo();
+    }
+    
+    @FXML
+    private void handleAddActivity() {
+        if (selectedMember == null) {
+            showAlert("Warning", "Pilih anggota terlebuh dahulu!", Alert.AlertType.WARNING);
+            return;
+        }
+        
+        String activity = txtActivity.getText();
+        if (activity == null || activity.trim().isEmpty()) {
+            showAlert("Error", "Aktivitas tidak boleh kosong!", Alert.AlertType.ERROR);
+            return;
+        }
+        
+        selectedMember.addActivity(activity);
+        txtActivity.clear();
+        tblMembers.refresh();
+        updateSelectedMemberInfo();
+        showAlert("Success", "Aktivitas berhasil ditambahkan!", Alert.AlertType.INFORMATION);
+    }
+    
+    @FXML
+    private void handleMemberDoubleClick() {
+        if (selectedMember != null) {
+            txtName.setText(selectedMember.getName());
+        }
+    }
+
+       @FXML
+    private void handleBackButton() throws java.io.IOException {
+        App.setRoot("HomeView");
+    }
+
 
     private void updateSelectedMemberInfo() {
         if (selectedMember != null) {
-            lblSelectedMember.setText("Terpilih: " + selectedMember.getName());
-            listActivities.setItems(FXCollections.observableArrayList(selectedMember.getActivities()));
+            lblSelectedMember.setText("Selected: " + selectedMember.getName() + " (" + selectedMember.getMemberId() + ")");
+            txtDetails.setText(selectedMember.getMemberDetails());
+            
+            // Update activities list
+            ObservableList<String> activities = FXCollections.observableArrayList(selectedMember.getActivities());
+            listActivities.setItems(activities);
         } else {
-            lblSelectedMember.setText("Tidak ada anggota terpilih");
+            lblSelectedMember.setText("No member selected");
+            txtDetails.clear();
             listActivities.getItems().clear();
         }
     }
-
-    private void clearForm() { 
-        txtName.clear(); 
-        txtCustomId.clear(); 
-        chkUseCustomId.setSelected(false); 
+    
+    private void updateUI() {
+        lblTotalMembers.setText("Total Members: " + memberList.size());
     }
     
-    private void updateUI() { 
-        lblTotalMembers.setText("Total Anggota: " + App.library.members.size()); 
+    private void clearForm() {
+        txtName.clear();
+        txtCustomId.clear();
+        txtActivity.clear();
+        chkUseCustomId.setSelected(false);
     }
     
-    private void showAlert(String title, String msg, Alert.AlertType type) { 
-        Alert a = new Alert(type, msg); 
-        a.setTitle(title); 
-        a.setHeaderText(null); 
-        a.showAndWait(); 
-    }
-    
-    /**
-     * Check if ID already exists in the member list
-     */
     private boolean isIdExists(String id) {
-        return App.library.members.stream()
-               .anyMatch(member -> member.getMemberId().equals(id));
+        return memberList.stream().anyMatch(member -> member.getMemberId().equals(id));
     }
     
-    /**
-     * Generate unique auto ID with format M001, M002, M003, etc.
-     * Ensures no duplicate IDs exist in the current member list
-     */
-    private String generateUniqueAutoId() {
-        int nextNumber = 1;
-        String candidateId;
-        
-        // Find the next available number
-        do {
-            candidateId = "M" + String.format("%03d", nextNumber);
-            nextNumber++;
-        } while (isIdExists(candidateId));
-        
-        return candidateId;
+    private void showAlert(String title, String message, Alert.AlertType type) {
+        Alert alert = new Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+    
+    private void addSampleData() {
+        try {
+            Member member1 = new Member("John Doe");
+            member1.addActivity("Terdaftar di Perpustakaan");
+            member1.addActivity("Buku yang dipinjam: Java Programming");
+            
+            Member member2 = new Member("Jane Smith");
+            member2.addActivity("Terdaftar di Perpustakaan");
+            member2.addActivity("Buku yang dipinjam: Python Basics");
+            member2.addActivity("Buku yang dikembalikan: Python Basics");
+            
+            memberList.addAll(member1, member2);
+            updateUI();
+        } catch (Exception e) {
+            System.err.println("Error adding sample data: " + e.getMessage());
+        }
     }
 }

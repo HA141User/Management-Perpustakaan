@@ -1,22 +1,26 @@
 package management.perpustakaan;
 
 import java.io.IOException;
+
 import java.util.stream.Collectors;
 import Models.Book;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
 
 public class BookController {
+
     // FXML fields...
+
     @FXML private TableView<Book> bookTable;
     @FXML private TableColumn<Book, Integer> idColumn;
     @FXML private TableColumn<Book, String> titleColumn;
     @FXML private TableColumn<Book, String> authorColumn;
-    @FXML private TableColumn<Book, Boolean> statusColumn;
+    @FXML private TableColumn<Book, String> statusColumn; // Ubah dari Boolean ke String
     @FXML private VBox formVBox;
     @FXML private TextField titleField;
     @FXML private TextField authorField;
@@ -33,7 +37,35 @@ public class BookController {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("itemId"));
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
-        statusColumn.setCellValueFactory(new PropertyValueFactory<>("isBorrowed"));
+        
+        // Custom cell value factory untuk status yang user-friendly
+        statusColumn.setCellValueFactory(cellData -> {
+            Book book = cellData.getValue();
+            String statusText = book.getIsBorrowed() ? "Dipinjam" : "Tersedia";
+            return new javafx.beans.property.SimpleStringProperty(statusText);
+        });
+
+        // Optional: Tambahkan styling untuk status
+        statusColumn.setCellFactory(column -> {
+            return new TableCell<Book, String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        // Warna berbeda untuk status yang berbeda
+                        if ("Dipinjam".equals(item)) {
+                            setStyle("-fx-text-fill: #d32f2f; -fx-font-weight: bold;"); // Merah
+                        } else {
+                            setStyle("-fx-text-fill: #388e3c; -fx-font-weight: bold;"); // Hijau
+                        }
+                    }
+                }
+            };
+        });
 
         refreshBookTable();
         formVBox.setVisible(false);
@@ -41,16 +73,20 @@ public class BookController {
         editButton.setDisable(true);
         deleteButton.setDisable(true);
 
+
         bookTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
             boolean isItemSelected = newSelection != null;
             editButton.setDisable(!isItemSelected);
             deleteButton.setDisable(!isItemSelected);
+
+
             if (isItemSelected) {
                 formVBox.setVisible(false);
                 selectedBookForEdit = null;
             }
         });
     }
+
 
     private void refreshBookTable() {
         ObservableList<Book> bookList = FXCollections.observableArrayList(
@@ -110,6 +146,7 @@ public class BookController {
             showAlert(Alert.AlertType.ERROR, "Input Tidak Valid", "ID Buku harus berupa angka.");
         } catch (Exception e) {
             showAlert(Alert.AlertType.ERROR, "Proses Gagal", e.getMessage());
+
         }
     }
 
@@ -118,12 +155,15 @@ public class BookController {
         String title = titleField.getText();
         String author = authorField.getText();
 
+
         if (title.trim().isEmpty() || author.trim().isEmpty()) {
+
             showAlert(Alert.AlertType.ERROR, "Input Tidak Valid", "Judul dan Penulis tidak boleh kosong.");
             return;
         }
 
         if (selectedBookForEdit == null) {
+
             int newId = App.library.items.stream().mapToInt(item -> item.getItemId()).max().orElse(0) + 1;
             App.library.items.add(new Book(title, newId, false, author));
         } else {
@@ -135,12 +175,14 @@ public class BookController {
         formVBox.setVisible(false);
         titleField.clear();
         authorField.clear();
+
     }
 
     @FXML
     private void handleDeleteButton() {
         Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
         if (selectedBook != null) {
+
             Alert confirmation = new Alert(Alert.AlertType.CONFIRMATION, "Yakin hapus: " + selectedBook.getTitle() + "?", ButtonType.YES, ButtonType.NO);
             confirmation.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.YES) {
@@ -166,3 +208,4 @@ public class BookController {
     
     private void showAlert(Alert.AlertType type, String title, String msg) { Alert a = new Alert(type, msg); a.setTitle(title); a.setHeaderText(null); a.showAndWait(); }
 }
+
