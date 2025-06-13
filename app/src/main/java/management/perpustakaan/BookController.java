@@ -25,6 +25,10 @@ public class BookController {
     @FXML private TextField returnBookIdField;
     @FXML private Button editButton;
     @FXML private Button deleteButton;
+    @FXML private Button borrowButton; // Tambahkan fx:id untuk tombol Pinjam Buku
+    @FXML private Button returnButton; // Tambahkan fx:id untuk tombol Kembalikan Buku
+    @FXML private VBox borrowVBox;
+    @FXML private VBox returnVBox;
 
     private Book selectedBookForEdit = null;
 
@@ -66,6 +70,10 @@ public class BookController {
         refreshBookTable();
         formVBox.setVisible(false);
         formVBox.managedProperty().bind(formVBox.visibleProperty());
+        borrowVBox.setVisible(false);
+        borrowVBox.managedProperty().bind(borrowVBox.visibleProperty());
+        returnVBox.setVisible(false);
+        returnVBox.managedProperty().bind(returnVBox.visibleProperty());
         editButton.setDisable(true);
         deleteButton.setDisable(true);
 
@@ -81,12 +89,12 @@ public class BookController {
     }
 
     private void refreshBookTable() {
-        ObservableList<Book> bookList = FXCollections.observableArrayList(
-                App.library.items.stream()
-                        .filter(item -> item instanceof Book)
-                        .map(item -> (Book) item)
-                        .collect(Collectors.toList())
-        );
+        ObservableList<Book> bookList = FXCollections.observableArrayList();
+        for (var item : App.library.items) {
+            if (item instanceof Book) {
+            bookList.add((Book) item);
+            }
+        }
         bookTable.setItems(bookList);
     }
 
@@ -193,4 +201,44 @@ public class BookController {
     }
     
     private void showAlert(Alert.AlertType type, String title, String msg) { Alert a = new Alert(type, msg); a.setTitle(title); a.setHeaderText(null); a.showAndWait(); }
+
+    @FXML
+    private void handleBorrowButton() {
+        // Pindahkan logika peminjaman buku ke metode ini jika diperlukan
+        handleBorrowAction();
+    }
+
+    @FXML
+    private void handleReturnButton() {
+        // Pindahkan logika pengembalian buku ke metode ini jika diperlukan
+        handleReturnAction();
+    }
+
+    // Handler untuk menampilkan/menyembunyikan form
+    @FXML
+    private void showBorrowForm() {
+        borrowVBox.setVisible(true);
+        returnVBox.setVisible(false);
+        formVBox.setVisible(false);
+        borrowMemberIdField.clear();
+        borrowBookIdField.clear();
+    }
+
+    @FXML
+    private void hideBorrowForm() {
+        borrowVBox.setVisible(false);
+    }
+
+    @FXML
+    private void showReturnForm() {
+        returnVBox.setVisible(true);
+        borrowVBox.setVisible(false);
+        formVBox.setVisible(false);
+        returnBookIdField.clear();
+    }
+
+    @FXML
+    private void hideReturnForm() {
+        returnVBox.setVisible(false);
+    }
 }
